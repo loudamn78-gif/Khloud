@@ -197,6 +197,66 @@ html.fx-pre #title{opacity:0}
 @keyframes sbb{0%{transform:translate(0,0);opacity:1}100%{transform:translate(-100%,0);opacity:0}}
 @keyframes sbt{0%{transform:translate(0,0);opacity:1}100%{transform:translate(100%,0);opacity:0}}
 </style>
+<style id="resp">
+/* ===== Responsive + touch hardening ===== */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{overflow-x:clip}
+img,svg,canvas,video{max-width:100%}
+.card,.cb{overflow-wrap:anywhere}
+
+/* footer actions: stacked, wrap safely, stay clear of the floating SOS button */
+footer{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
+footer br{display:none}
+footer .chip{display:flex;align-items:center;justify-content:center;width:fit-content;max-width:100%;min-height:44px;margin:10px auto 0;padding:6px 18px;white-space:normal;text-align:center;line-height:1.5;box-sizing:border-box}
+
+/* modals: safe-centering (never clipped at the top), safe areas, own scroll */
+.ov{align-items:flex-start;padding:max(14px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.ov>.card{margin:auto;max-width:min(420px,100%);box-sizing:border-box}
+.ov .row{justify-content:center}
+.ov .row .btn{flex:1 1 140px;text-align:center}
+#airep{padding:max(14px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))!important;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+#airep>.card{max-width:min(560px,100%)!important;box-sizing:border-box}
+
+/* dynamic viewport height (mobile browser bars) */
+@supports (height:100dvh){.chatwrap{height:min(80dvh,680px)}}
+
+/* touch */
+a,button,.chip,.btn,label,summary,select,input,textarea{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+nav a{position:relative}
+nav a:after{content:"";position:absolute;inset:-6px -2px}
+@media (pointer:coarse){
+.chip,.btn,button{min-height:44px}
+.send{min-width:44px}
+textarea,input,select{font-size:16px}
+}
+@media (hover:none){
+.btn:hover{transform:none;box-shadow:none}
+.card:hover{transform:none}
+}
+
+/* small phones */
+@media (max-width:360px){
+nav a{font-size:13px;padding:2px 9px}
+.chip{font-size:14px}
+.ov .card{padding:16px}
+}
+/* landscape phones */
+@media (max-height:480px) and (orientation:landscape){
+#hero{min-height:auto;padding:28px 0}
+#title{font-size:clamp(56px,16vh,96px)}
+.chatwrap{height:min(88dvh,520px)}
+footer{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+}
+/* tablets */
+@media (min-width:768px){
+footer .chip{min-height:40px}
+.ov>.card{max-width:460px}
+}
+/* while typing (keyboard open) the SOS pill becomes a compact icon at the top so it never covers the input */
+html.typing .sosbar{bottom:auto;top:calc(env(safe-area-inset-top,0px) + 112px);justify-content:flex-end;padding:0 10px;background:none}
+html.typing .sosbar .chip{width:44px;height:44px;min-height:44px;padding:0;font-size:0;display:flex;align-items:center;justify-content:center;border-radius:50%}
+html.typing .sosbar .chip:before{content:"🆘";font-size:20px}
+</style>
 </head>
 <body>
 <canvas id="bg" aria-hidden="true"></canvas>
@@ -1185,6 +1245,12 @@ function refresh(){if(btn)btn.textContent=on()?'🤝 الوكيل الخارجي
 function ready(f){if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',f);else f()}
 ready(function(){if(on())load();var f=document.querySelector('footer');if(!f)return;btn=document.createElement('button');btn.type='button';btn.className='chip';btn.style.marginTop='10px';btn.onclick=function(){if(on())off();else ask()};f.appendChild(document.createElement('br'));f.appendChild(btn);refresh()})
 })();
+</script>
+<script>
+/* keyboard-aware SOS: add html.typing while a text field is focused */
+(function(){var r=document.documentElement,t=null;function isF(e){return e&&/^(INPUT|TEXTAREA|SELECT)$/.test(e.tagName)}
+document.addEventListener('focusin',function(e){if(isF(e.target)){clearTimeout(t);r.classList.add('typing')}});
+document.addEventListener('focusout',function(e){if(isF(e.target)){t=setTimeout(function(){if(!isF(document.activeElement))r.classList.remove('typing')},150)}})})();
 </script>
 </body>
 </html>
